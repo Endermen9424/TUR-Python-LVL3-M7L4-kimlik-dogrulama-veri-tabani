@@ -34,8 +34,10 @@ def display_users():
     with sqlite3.connect(DB_NAME) as conn:
         cursor = conn.cursor()
         cursor.execute('SELECT username, email FROM users')
+        users = cursor.fetchall()
         for user in cursor.fetchall():
             print(f"Kullanıcı adı: {user[0]}, E-posta: {user[1]}")
+        return users
 
 
 def user_choice():

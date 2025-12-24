@@ -44,3 +44,28 @@ Var olmayan bir kullanıcıyla doğrulama yapmayı test etme.
 Yanlış şifreyle doğrulama yapmayı test etme.
 Kullanıcı listesinin doğru şekilde görüntülenmesini test etme.
 """
+
+def test_add_existing_user(setup_database, connection):
+    """Var olan bir kullanıcı adıyla kullanıcı eklemeye çalışmayı test eder."""
+    add_user("Ali", "ali@example.com", "123456")
+    add_user("Ali", "ali@example.com", "123456")
+
+    cursor = connection.cursor()
+    cursor.execute("SELECT COUNT(*) FROM users WHERE username='Ali';")
+    count = cursor.fetchall()
+    assert len(count) == 1, "Aynı kullanıcı adıyla birden fazla kullanıcı eklenmemelidir."
+
+def test_authenticate_user_success(setup_database):
+    """Başarılı kullanıcı doğrulamasını test eder."""
+    add_user("Veli", "veli@example.com", "password123")
+    assert authenticate_user("Veli", "password123") is True, "Doğru kullanıcı adı ve şifre ile doğrulama başarılı olmalıdır."
+
+def test_authenticate_user_nonexistent(setup_database):
+    """Var olmayan bir kullanıcıyla doğrulama yapmayı test eder."""
+    assert authenticate_user("NonExistentUser", "somepassword") is False, "Var olmayan kullanıcıyla doğrulama başarısız olmalıdır."
+
+def test_authenticate_user_wrong_password(setup_database):
+    """Yanlış şifreyle doğrulama yapmayı test eder."""
+    add_user("Mehmet", "email@gmail.com", "correctpassword")
+    assert authenticate_user("Mehmet", "wrongpassword") is False, "Yanlış şifreyle doğrulama başarısız olmalıdır."
+
